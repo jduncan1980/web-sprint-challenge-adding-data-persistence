@@ -18,6 +18,22 @@ const addResource = async (resource) => {
 	return db('resources').where({ id }).first();
 };
 
+const findResourcesByProjectId = (id) => {
+	return db('resources as r')
+		.join('projects_resources as pr', 'r.id', 'pr.resource_id')
+		.join('projects as p', 'p.id', 'pr.project_id')
+		.select('p.name as projectName', 'r.name', 'r.description')
+		.where('pr.project_id', id);
+};
+
+const findProjectsByResourceId = (id) => {
+	return db('projects as p')
+		.join('projects_resources as pr', 'p.id', 'pr.project_id')
+		.join('resources as r', 'r.id', 'pr.resource_id')
+		.select('r.name as resourceName', 'p.name as projectName')
+		.where('pr.resource_id', id);
+};
+
 const findTasks = () => {
 	return db('tasks as t')
 		.join('projects as p', 'p.id', 't.project_id')
@@ -35,6 +51,10 @@ const addTask = async (task) => {
 	return db('tasks').where({ id }).first();
 };
 
+// Find all tasks for project.
+const findTasksByProjectId = (id) => {
+	return db('tasks').where('project_id', id);
+};
 module.exports = {
 	findProjects,
 	addProject,
@@ -42,4 +62,7 @@ module.exports = {
 	addResource,
 	findTasks,
 	addTask,
+	findResourcesByProjectId,
+	findTasksByProjectId,
+	findProjectsByResourceId,
 };
